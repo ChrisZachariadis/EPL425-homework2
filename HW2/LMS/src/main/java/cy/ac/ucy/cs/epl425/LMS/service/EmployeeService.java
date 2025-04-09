@@ -34,4 +34,13 @@ public class EmployeeService {
     public Employee saveEmployee(Employee employee) {
         return this.employeeRepository.save(employee);
     }
+
+    
+    public void deleteeAllEmployees() {
+        this.employeeRepository.deleteAll();
+    }
+
+    public void deleteEmployeeById(Long id) {
+        this.employeeRepository.deleteById(id);
+    }
 }
