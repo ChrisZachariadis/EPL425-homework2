@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import cy.ac.ucy.cs.epl425.LMS.model.Employee;
@@ -26,9 +27,15 @@ public class EmployeeController {
 
     // Simple GET request to fetch all employees
     @GetMapping("/employees")
-    public List<Employee> getAllEmployees() {
-        return employeeService.getAllEmployees();
+    public List<Employee> getAllEmployees(@RequestParam(required = false) String department) {
+        if (department != null && !department.isEmpty()) {
+            return (List<Employee>) employeeService.getEmployeesByDepartmentContaining(department);
+        } else {
+            return employeeService.getAllEmployees();
+        }
     }
+    
+    
 
     @GetMapping("/employees/{id}")
     public ResponseEntity<Employee> getEmployeeById(@PathVariable("id") Long id) {
@@ -80,14 +87,12 @@ public class EmployeeController {
 
     @DeleteMapping("/employees/{id}")
     public ResponseEntity<HttpStatus> deleteEmployee(@PathVariable("id") Long id) {
-      try {
-        employeeService.deleteEmployeeById(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-      } catch (Exception e) {
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-      }
+        try {
+            employeeService.deleteEmployeeById(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
-
-
 
 }
