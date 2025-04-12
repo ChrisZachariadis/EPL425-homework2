@@ -129,19 +129,24 @@ function onLoadLeaves() {
                 const column1 = document.createElement('td');
                 column1.textContent=object.id;
                 row.appendChild(column1);
-                
-                const column2 = document.createElement('td');
-                // synchronous AJAX request
-                const xhr = new XMLHttpRequest();
-                xhr.open('GET', 'http://'+hostname+':'+port+'/api/employees/'+object.employeeId, false);  // `false` makes the request synchronous
-                xhr.send(null);
 
-                if (xhr.status === 200) {
-                    let employee = JSON.parse(xhr.responseText);
+                const column2 = document.createElement('td');
+                const xhrEmp = new XMLHttpRequest();
+                xhrEmp.open('GET', 'http://' + hostname + ':' + port + '/api/employees/' + object.employeeId, false);
+
+                // Include auth for nested employee call too
+                let username = document.querySelector('#username').value;
+                let password = document.querySelector('#password').value;
+                let auth = btoa(username + ':' + password);
+                xhrEmp.setRequestHeader('Authorization', 'Basic ' + auth);
+
+                xhrEmp.send(null);
+                if (xhrEmp.status === 200) {
+                    let employee = JSON.parse(xhrEmp.responseText);
                     column2.textContent = employee.firstname + ' ' + employee.lastname;
                 }
                 row.appendChild(column2);
-                
+
                 const column3 = document.createElement('td');
                 column3.textContent=object.description;
                 row.appendChild(column3);
@@ -149,15 +154,15 @@ function onLoadLeaves() {
                 const column4 = document.createElement('td');
                 column4.textContent=object.startDate;
                 row.appendChild(column4);
-                
+
                 const column5 = document.createElement('td');
                 column5.textContent=object.endDate;
                 row.appendChild(column5);
-                
+
                 const column6 = document.createElement('td');
                 column6.textContent=object.approved;
                 row.appendChild(column6);
-                
+
                 const column7 = document.createElement('td');
                 const buttonedit = document.createElement('button');
                 buttonedit.classList.add('btn', 'btn-warning', 'btn-sm');
@@ -174,7 +179,7 @@ function onLoadLeaves() {
 
                 table.appendChild(row);
             }
-            
+
         } else if (xhr.status === 204) {
             const table = document.querySelector('#leaves');
             table.innerHTML = '';
@@ -211,6 +216,13 @@ function onLoadLeaves() {
     }
     console.log(url);
     xhr.open('GET', url);
+
+    // Add Basic Auth headers
+    let username = document.querySelector('#username').value;
+    let password = document.querySelector('#password').value;
+    let auth = btoa(username + ':' + password);
+    xhr.setRequestHeader('Authorization', 'Basic ' + auth);
+
     xhr.send();
 }
 
@@ -275,6 +287,7 @@ function onInsertLeave() {
         }
     };
     xhr.open('POST', 'http://'+hostname+':'+port+'/api/leaves/employees/'+document.querySelector('#employeeId').value);
+    // xhr.open('POST', 'http://'+hostname+':'+port+'/api/leaves');
     xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
     let username = document.querySelector('#username').value;
     let password = document.querySelector('#password').value;
@@ -378,26 +391,25 @@ function onDeleteAllLeaves() {
         if (xhr.readyState !== 4) return;
         if (xhr.status === 200 || xhr.status === 202 || xhr.status === 204) {
             removeAlert();
-            //console.log(JSON.parse(xhr.responseText));
-            onLoadEmployees();
+            onLoadLeaves(); // ✅ Add this line to refresh the list
         } else {
             if (xhr.status === 401) {
                 alertElement.textContent = 'User Unauthorized (401)';
                 alertElement.classList.remove('d-none');
-            }
-            else if (xhr.status === 403) {
+            } else if (xhr.status === 403) {
                 alertElement.textContent = 'Access to Resource Forbidden (403)';
                 alertElement.classList.remove('d-none');
             }
         }
     };
-    xhr.open('DELETE', 'http://'+hostname+':'+port+'/api/leaves');
+    xhr.open('DELETE', 'http://' + hostname + ':' + port + '/api/leaves');
     let username = document.querySelector('#username').value;
     let password = document.querySelector('#password').value;
-    let auth = btoa(username+':'+password);
-    xhr.setRequestHeader('Authorization', 'Basic '+auth);
+    let auth = btoa(username + ':' + password);
+    xhr.setRequestHeader('Authorization', 'Basic ' + auth);
     xhr.send();
 }
+
 
 function onEditEmployee() {
     if(!isDataValidatedEmployee())
