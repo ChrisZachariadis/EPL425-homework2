@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import cy.ac.ucy.cs.epl425.LMS.model.Leave;
@@ -24,31 +25,36 @@ public class LeaveController {
     @Autowired
     LeaveService leaveService;
 
-    // Simple GET request to fetch all leaves
+    // GET /api/leaves?startDate=xxx&endDate=yyy&approved=true
     @GetMapping("/leaves")
-    public List<Leave> getAllLeaves() {
-        return leaveService.getAllLeaves();
-    }
+    public ResponseEntity<List<Leave>> getAllLeaves(
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
+            @RequestParam(required = false) Boolean approved) {
 
-    @GetMapping("/leaves/{id}")
-    public ResponseEntity<Leave> getLeaveById(@PathVariable("id") Long id) {
-        Leave laeve = leaveService.getLeaveById(id);
-
-        if (laeve != null) {
-            return new ResponseEntity<>(laeve, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        List<Leave> result = leaveService.getFilteredLeaves(startDate, endDate, approved);
+        if (result.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PostMapping("/leaves")
-    public ResponseEntity<Leave> createLeave(@RequestBody Leave leave) {
-    try {
-        Leave _leave = leaveService.saveLeave(new Leave(leave.getEmployeeId(), leave.getDescription(), leave.getStartDate(), leave.getEndDate(), leave.getApproved()));
-    return new ResponseEntity<>(_leave, HttpStatus.CREATED);
-    } catch (Exception e) {
-    return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    // POST /api/leaves/employees/{employeeId}
+    @PostMapping("/leaves/employees/{employeeId}")
+    public ResponseEntity<Leave> createLeave(@PathVariable Long employeeId, @RequestBody Leave leave) {
+        try {
+            Leave _leave = new Leave();
+            _leave.setEmployeeId(employeeId);
+            _leave.setDescription(leave.getDescription());
+            _leave.setStartDate(leave.getStartDate());
+            _leave.setEndDate(leave.getEndDate());
+            _leave.setApproved(leave.getApproved());
+
+            Leave savedLeave = leaveService.saveLeave(_leave);
+            return new ResponseEntity<>(savedLeave, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PutMapping("/leaves/{id}")
@@ -77,6 +83,7 @@ public class LeaveController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    
 
     @DeleteMapping("/leaves/{id}")
     public ResponseEntity<HttpStatus> deleteEmployee(@PathVariable("id") Long id) {

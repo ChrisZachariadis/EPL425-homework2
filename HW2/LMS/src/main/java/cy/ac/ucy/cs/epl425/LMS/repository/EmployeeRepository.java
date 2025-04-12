@@ -17,6 +17,7 @@ public interface EmployeeRepository extends CrudRepository<Employee, Long> {
     Iterable<Employee> findByLastnameContaining(String lastname);
     // returns all Employee entities whose department column has the value val.
     Iterable<Employee> findByDepartment(String depatment);
+    Iterable<Employee> findByDepartmentContaining(String department);
 
 
 }

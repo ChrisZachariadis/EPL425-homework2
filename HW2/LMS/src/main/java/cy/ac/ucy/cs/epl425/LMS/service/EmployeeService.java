@@ -30,6 +30,11 @@ public class EmployeeService {
 
     }
 
+    public Iterable<Employee> getEmployeesByDepartmentContaining(String department) {
+        return this.employeeRepository.findByDepartmentContaining(department);
+    }
+     
+    
 
     public Employee saveEmployee(Employee employee) {
         return this.employeeRepository.save(employee);
