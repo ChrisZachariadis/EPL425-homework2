@@ -45,7 +45,7 @@ public class EmployeeController {
     public ResponseEntity<Employee> createBook(@RequestBody Employee employee) {
         try {
             Employee _employee = employeeService
-                    .saveEmployee(new Employee(employee.getFirstName(), employee.getLastName(),
+                    .saveEmployee(new Employee(employee.getFirstname(), employee.getLastname(),
                             employee.getDepartment(), employee.getDateOfBirth()));
             return new ResponseEntity<>(_employee, HttpStatus.CREATED);
         } catch (Exception e) {
@@ -58,8 +58,8 @@ public class EmployeeController {
         Employee _employee = employeeService.getEmployeeById(id);
 
         if (_employee != null) {
-            _employee.setFirstname(employee.getFirstName());
-            _employee.setLastname(employee.getLastName());
+            _employee.setFirstname(employee.getFirstname());
+            _employee.setLastname(employee.getLastname());
             _employee.setDepartment(employee.getDepartment());
             _employee.setDateOfBirth(employee.getDateOfBirth());
             return new ResponseEntity<>(employeeService.saveEmployee(_employee), HttpStatus.OK);

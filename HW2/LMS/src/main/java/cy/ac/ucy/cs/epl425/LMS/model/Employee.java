@@ -41,10 +41,10 @@ public class Employee {
     public Long getId() {
         return id;
     }
-    public String getFirstName() {
+    public String getFirstname() {
         return firstname;
     }
-    public String getLastName() {
+    public String getLastname() {
         return lastname;
     }
 
