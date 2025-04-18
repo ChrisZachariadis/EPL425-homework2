@@ -44,6 +44,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.PUT, "/api/employees/**").hasAnyRole("MANAGER")
                         .requestMatchers(HttpMethod.DELETE, "/api/employees/**").hasAnyRole("MANAGER")
                         .requestMatchers(HttpMethod.GET, "/api/employees/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/leaves/**").permitAll()
                         .anyRequest().authenticated())
                 .authenticationManager(authenticationManager);
 
