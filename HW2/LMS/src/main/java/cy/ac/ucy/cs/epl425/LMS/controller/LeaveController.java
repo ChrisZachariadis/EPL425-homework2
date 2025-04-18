@@ -39,6 +39,16 @@ public class LeaveController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @GetMapping("/leaves/{id}")
+    public ResponseEntity<Leave> getLeaveById(@PathVariable("id") Long id) {
+        Leave leave = leaveService.getLeaveById(id);
+        if (leave != null) {
+            return new ResponseEntity<>(leave, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     // POST /api/leaves/employees/{employeeId}
     @PostMapping("/leaves/employees/{employeeId}")
     public ResponseEntity<Leave> createLeave(@PathVariable Long employeeId, @RequestBody Leave leave) {
@@ -83,10 +93,9 @@ public class LeaveController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
 
     @DeleteMapping("/leaves/{id}")
-    public ResponseEntity<HttpStatus> deleteEmployee(@PathVariable("id") Long id) {
+    public ResponseEntity<HttpStatus> deleteLeave(@PathVariable("id") Long id) {
         try {
             leaveService.deleteLeaveById(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
